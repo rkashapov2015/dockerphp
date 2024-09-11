@@ -1,4 +1,4 @@
-### For php application 
+### For php laravel application 
 
 ### stack containers:
 * nginx: `webserver`
