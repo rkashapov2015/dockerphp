@@ -1,8 +1,8 @@
 ### For php laravel application 
 
 ### stack containers:
-* nginx: `webserver`
-* php-fpm: `app`
+* webserver: `nginx`
+* app: `php 8.1`
 * db: `mysql 8`
 
 ### before begin
