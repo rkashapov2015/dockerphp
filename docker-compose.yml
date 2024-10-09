@@ -1,9 +1,7 @@
 services:
   app:
     build:
-      context: .
       dockerfile: ./services/php/Dockerfile
-    image: php:8.2
     container_name: app
     restart: unless-stopped
     tty: true
@@ -19,9 +17,8 @@ services:
       - app-network
   app_debug:
     build:
-      context: .
-      dockerfile: ./services/php/debug/Dockerfile
-    image: php:8.2
+      context: ./services/php/debug
+      dockerfile: Dockerfile
     container_name: app_debug
     restart: unless-stopped
     tty: true
@@ -32,6 +29,7 @@ services:
     volumes:
       - ./application:/var/www/application
       - ./services/php/config/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./services/php/config/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
     hostname: app_debug
     networks:
       - app-network

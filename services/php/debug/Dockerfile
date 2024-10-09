@@ -27,15 +27,6 @@ RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl gd bcmath soap 
     && pecl install pdo_sqlsrv-5.10.1 xdebug \
     && docker-php-ext-enable pdo_sqlsrv xdebug
 
-RUN echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.mode=develop,coverage,debug,profile" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.log=/dev/stdout" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.log_level=0" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.discover_client_host=1" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.client_host=10.255.255.254" >> /usr/local/etc/php/conf.d/xdebug.ini
-
 # Загружаем актуальную версию Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 # Создаём пользователя и группу www для приложения Laravel
