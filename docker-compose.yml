@@ -50,6 +50,7 @@ services:
     container_name: postgres
     restart: always
     environment:
+      - POSTGRES_DB=laravel
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
