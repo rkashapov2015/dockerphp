@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
 # Очищаем кэш
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Устанавливаем расширения PHP
-RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl gd bcmath soap \
+RUN docker-php-ext-install pdo pdo_mysql pgsql pdo_pgsql mbstring zip exif pcntl gd bcmath soap \
     && pecl install pdo_sqlsrv-5.10.1 xdebug \
     && docker-php-ext-enable pdo_sqlsrv xdebug
 
