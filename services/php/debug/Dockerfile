@@ -1,5 +1,17 @@
 FROM php:8.2-fpm
 
+ENV ACCEPT_EULA=Y
+
+RUN apt-get update && apt-get install -y gnupg2
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && echo "Package: unixodbc\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft \
+    && echo "Package: unixodbc-dev\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft \
+    && echo "Package: libodbc1:amd64\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft \
+    && echo "Package: odbcinst\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft \
+    && echo "Package: odbcinst1debian2:amd64\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft
+
 # Устанавливаем зависимости
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -19,13 +31,14 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libxml2-dev \
     unixodbc-dev \
-    npm
+    unixodbc \
+    npm msodbcsql18 mssql-tools18
 # Очищаем кэш
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Устанавливаем расширения PHP
 RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl gd bcmath soap \
-    && pecl install pdo_sqlsrv-5.10.1 xdebug \
-    && docker-php-ext-enable pdo_sqlsrv xdebug
+    && pecl install sqlsrv pdo_sqlsrv xdebug \
+    && docker-php-ext-enable sqlsrv pdo_sqlsrv xdebug
 
 # Загружаем актуальную версию Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
