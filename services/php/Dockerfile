@@ -52,6 +52,10 @@ RUN useradd -u 1000 -ms /bin/bash -g www www && \
 # # Меняем пользователя на www
 USER www
 
+# Добавляем путь до mssql-tools
+ARG MSSQLTOOLS_PATH=/opt/mssql-tools18
+ENV PATH=$MSSQLTOOLS_PATH/bin:$PATH
+
 WORKDIR /var/www
 
 # В контейнере открываем 9000 порт и запускаем сервер php-fpm
