@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.5-fpm
 
 # Устанавливаем зависимости
 RUN apt-get update && apt-get install -y \
@@ -16,16 +16,18 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libonig-dev \
     libzip-dev \
-    libpng-dev \
     libxml2-dev \
     unixodbc-dev \
-    npm
+    unixodbc
 # Очищаем кэш
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Устанавливаем расширения PHP
-RUN docker-php-ext-install pdo pdo_mysql pgsql pdo_pgsql mbstring zip exif pcntl gd bcmath soap \
-    && pecl install pdo_sqlsrv-5.10.1 xdebug \
-    && docker-php-ext-enable pdo_sqlsrv xdebug
+RUN docker-php-ext-configure gd \
+    --with-jpeg \
+    --with-freetype \
+    && docker-php-ext-install pdo pdo_mysql pgsql pdo_pgsql mbstring zip exif pcntl gd bcmath soap \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug
 
 # Загружаем актуальную версию Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

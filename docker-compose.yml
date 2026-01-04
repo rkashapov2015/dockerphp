@@ -2,7 +2,6 @@ services:
   app:
     build:
       dockerfile: ./services/php/Dockerfile
-    container_name: app
     restart: unless-stopped
     tty: true
     environment:
@@ -19,11 +18,9 @@ services:
     build:
       context: ./services/php/debug
       dockerfile: Dockerfile
-    container_name: app_debug
     restart: unless-stopped
     tty: true
     environment:
-      SERVICE_NAME: app_debug
       SERVICE_TAGS: dev
     working_dir: /var/www/application
     volumes:
@@ -35,26 +32,24 @@ services:
       - app-network
   webserver:
     image: nginx:alpine
-    container_name: webserver
     restart: unless-stopped
     tty: true
     ports:
-      - "8000:80"
+      - "${HOST_PORT:-8000}:80"
     volumes:
       - ./application:/var/www/application
       - ./services/nginx/conf.d:/etc/nginx/conf.d
     networks:
       - app-network
   postgres:
-    image: postgres:14.1-alpine
-    container_name: postgres
+    image: postgres:18.1-alpine
     restart: always
     environment:
-      - POSTGRES_DB=laravel
+      - POSTGRES_DB=application
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - '54321:5432'
+      - '${DB_PORT:-54321}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     hostname: postgres
@@ -62,13 +57,12 @@ services:
       - app-network
   redis:
     image: redis:latest
-    container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     hostname: redis
     networks:
       - app-network
