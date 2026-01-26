@@ -55,7 +55,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${ROOT_DB_PASSWORD}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - newbienv_mysql_data:/var/lib/mysql
     hostname: db
     networks:
       - app-network
@@ -71,7 +71,8 @@ services:
     networks:
       - app-network
 volumes:
-  mysql_data:
+  newbienv_mysql_data:
+    external: true
   redis_data:
 networks:
   app-network:

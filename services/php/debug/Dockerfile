@@ -4,14 +4,6 @@ ENV ACCEPT_EULA=Y
 
 RUN apt-get update && apt-get install -y gnupg2
 
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && echo "Package: unixodbc\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft \
-    && echo "Package: unixodbc-dev\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft \
-    && echo "Package: libodbc1:amd64\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft \
-    && echo "Package: odbcinst\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft \
-    && echo "Package: odbcinst1debian2:amd64\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 100\n" >> /etc/apt/preferences.d/microsoft
-
 # Устанавливаем зависимости
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -32,11 +24,23 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     unixodbc-dev \
     unixodbc \
-    npm msodbcsql18 mssql-tools18
-# Очищаем кэш
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    libicu-dev
+
+# НОВЫЙ СПОСОБ установки MSSQL драйверов для Debian 11 (PHP 8.2)
+# Используем официальный репозиторий Microsoft
+RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc \
+    && curl -sSL https://packages.microsoft.com/config/debian/11/prod.list | tee /etc/apt/sources.list.d/mssql-release.list
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        msodbcsql18 \
+        mssql-tools18 \
+        unixodbc-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Устанавливаем расширения PHP
-RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl gd bcmath soap \
+RUN docker-php-ext-install pdo pgsql pdo_pgsql pdo_mysql mbstring zip exif pcntl gd bcmath soap \
     && pecl install sqlsrv pdo_sqlsrv xdebug \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv xdebug
 
@@ -47,7 +51,9 @@ RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www && \ 
     mkdir /var/www/application && \
     chown www:www /var/www/application
-# # Копируем содержимое текущего каталога в рабочую директорию
+
+# Добавляем путь до mssql-tools
+ENV PATH="/opt/mssql-tools18/bin:${PATH}"
 
 # # Меняем пользователя на www
 USER www
