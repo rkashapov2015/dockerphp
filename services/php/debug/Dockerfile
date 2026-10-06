@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
 ENV ACCEPT_EULA=Y
 
@@ -35,7 +35,6 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         msodbcsql18 \
         mssql-tools18 \
-        unixodbc-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

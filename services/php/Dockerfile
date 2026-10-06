@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
 ENV ACCEPT_EULA=Y
 
@@ -55,9 +55,13 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         intl \
         pgsql \
         mysqli \
-        sockets \
-    && pecl install sqlsrv pdo_sqlsrv \
-    && docker-php-ext-enable sqlsrv pdo_sqlsrv
+        sockets
+
+# Устанавливаем MSSQL драйверы отдельно, с проверкой успеха
+RUN pecl install sqlsrv && \
+    docker-php-ext-enable sqlsrv && \
+    pecl install pdo_sqlsrv && \
+    docker-php-ext-enable pdo_sqlsrv
 
 # Загружаем актуальную версию Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
